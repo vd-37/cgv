@@ -40,11 +40,7 @@ glRotatef(theta[0], 1.0, 0.0, 0.0);
 glRotatef(theta[1], 0.0, 1.0, 0.0);
 glRotatef(theta[2], 0.0, 0.0, 1.0);
 
-www.vtuloop.com
 
-10CSL67 – CG&V-Lab VI Sem. CSE
-
-Dept. of CSE, CIT,Gubbi -572 216. Page No. -37-
 colorcube();
 glFlush();
 glutSwapBuffers();
