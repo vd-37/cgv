@@ -164,3 +164,9 @@ int main(int argc, char** argv)
 	glutMainLoop();
 	return 0;
 }
+
+
+0 0 10 -20
+0 0 20 10
+0 0 10 20
+0 0 25 -15
