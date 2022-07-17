@@ -1,113 +1,99 @@
-/* simple shaded scene consisting of a tea pot on a table */
-#include <GL/glut.h>
-void wall(double thickness)
+#include<GL/glut.h>
+void teapot(GLfloat x, GLfloat y, GLfloat z)
 {
-	//draw thin wall with top = xz-plane, corner at origin
+	glPushMatrix(); //save the current state
+	glTranslatef(x, y, z); // move the item appropriately
+	glutSolidTeapot(0.1); //render your teapot
+	glPopMatrix(); //get back your state with the recent changes that you have done
+}
+
+void tableTop(GLfloat x, GLfloat y, GLfloat z) // table top which is actually a CUBE
+{
 	glPushMatrix();
-	glTranslated(0.5, 0.5 * thickness, 0.5);
-	glScaled(1.0, thickness, 1.0);
-	glutSolidCube(1.0);
+	glTranslatef(x, y, z);
+	glScalef(0.6, 0.02, 0.5);
+	glutSolidCube(1);
 	glPopMatrix();
 }
-//draw one table leg
-void tableLeg(double thick, double len)
+void tableLeg(GLfloat x, GLfloat y, GLfloat z) // table leg which is actually a CUBE
 {
 	glPushMatrix();
-	glTranslated(0, len / 2, 0);
-	glScaled(thick, len, thick);
-	glutSolidCube(1.0);
+	glTranslatef(x, y, z);
+	glScalef(0.02, 0.3, 0.02);
+	glutSolidCube(1);
 	glPopMatrix();
 }
-void table(double topWid, double topThick, double legThick, double legLen)
+void wall(GLfloat x, GLfloat y, GLfloat z) // wall which is actually a CUBE
 {
-	//draw the table - a top and four legs
-	//draw the top first
 	glPushMatrix();
-	glTranslated(0, legLen, 0);
-	glScaled(topWid, topThick, topWid);
-	glutSolidCube(1.0);
-	glPopMatrix();
-	double dist = 0.95 * topWid / 2.0 - legThick / 2.0;
-	glPushMatrix();
-	glTranslated(dist, 0, dist);
-	tableLeg(legThick, legLen);
-	glTranslated(0.0, 0.0, -2 * dist);
-	tableLeg(legThick, legLen);
-	glTranslated(-2 * dist, 0, 2 * dist);
-	tableLeg(legThick, legLen);
-	glTranslated(0, 0, -2 * dist);
-	tableLeg(legThick, legLen);
+	glTranslatef(x, y, z);
+	glScalef(1, 1, 0.02);
+	glutSolidCube(1);
 	glPopMatrix();
 }
-void displaySolid(void)
+void light() // set the lighting arrangements
 {
-	//set properties of the surface material
-	GLfloat mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f }; // gray
-	GLfloat mat_diffuse[] = { .5f, .5f, .5f, 1.0f };
-		GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat mat_shininess[] = { 50.0f };
+	GLfloat mat_ambient[] = { 1, 1, 1, 1 }; // ambient colour
+	GLfloat mat_diffuse[] = { 0.5, 0.5, 0.5, 1 };
+	GLfloat mat_specular[] = { 1, 1, 1, 1 };
+	GLfloat mat_shininess[] = { 50.0f }; // shininess value
 	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-	//set the light source properties
-	GLfloat lightIntensity[] = { 0.7f, 0.7f, 0.7f, 1.0f };
-	GLfloat light_position[] = { 2.0f, 6.0f, 3.0f, 0.0f };
+	GLfloat light_position[] = { 2, 6, 3, 1 };
+	GLfloat light_intensity[] = { 0.7, 0.7, 0.7, 1 }; // gray color
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightIntensity);
-	//set the camera
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_intensity);
+}
+void display()
+{
+	GLfloat teapotP = -0.07, tabletopP = -0.15, tablelegP = 0.2, wallP = 0.5;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+	gluLookAt(-2, 2, 5, 0, 0, 0, 0, 1, 0); // camera position & viewing
+	light(); //Adding light source to your project
+
+	teapot(0, teapotP, 0); //Create teapot
+
+	tableTop(0, tabletopP, 0); //Create table’s top
+
+	tableLeg(tablelegP, -0.3, tablelegP); //Create 1st leg
+	tableLeg(-tablelegP, -0.3, tablelegP); //Create 2nd leg
+	tableLeg(-tablelegP, -0.3, -tablelegP); //Create 3rd leg
+	tableLeg(tablelegP, -0.3, -tablelegP); //Create 4th leg
+
+	wall(0, 0, -wallP); //Create 1st wall
+	glRotatef(90, 1, 0, 0);
+	wall(0, 0, wallP); //Create 2nd wall
+	glRotatef(90, 0, 1, 0);
+	wall(0, 0, wallP); //Create 3rd wall
+
+	glFlush(); // show the output to the user
+}
+
+void init()
+{
+	glClearColor(0, 0, 0, 1); // black colour background
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	double winHt = 1.0; //half-height of window
-	glOrtho(-winHt * 64 / 48.0, winHt * 64 / 48.0, -winHt, winHt, 0.1, 100.0);
+	glOrtho(-1, 1, -1, 1, -1, 10);
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(2.3, 1.3, 2.0, 0.0, 0.25, 0.0, 0.0, 1.0, 0.0);
-	//start drawing
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushMatrix();
-	glTranslated(0.4, 0.4, 0.6);
-	glRotated(45, 0, 0, 1);
-	glScaled(0.08, 0.08, 0.08);
-	glPopMatrix();
-	glPushMatrix();
-	glTranslated(0.6, 0.38, 0.5);
-	glRotated(30, 0, 1, 0);
-	glutSolidTeapot(0.08);
-	glPopMatrix();
-	glPushMatrix();
-	glTranslated(0.25, 0.42, 0.35);
-	//glutSolidSphere (0.1, 15, 15);
-	glPopMatrix();
-	glPushMatrix();
-	glTranslated(0.4, 0, 0.4);
-	table(0.6, 0.02, 0.02, 0.3);
-	glPopMatrix();
-	wall(0.02);
-	glPushMatrix();
-	glRotated(90.0, 0.0, 0.0, 1.0);
-	wall(0.02);
-	glPopMatrix();
-	glPushMatrix();
-	glRotated(-90.0, 1.0, 0.0, 0.0);
-	wall(0.02);
-	glPopMatrix();
-	glFlush();
 }
-void main(int argc, char** argv)
+
+int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(640, 480);
-		glutInitWindowPosition(100, 100);
-	glutCreateWindow("simple shaded scene consisting of a tea pot on a table");
-		glutDisplayFunc(displaySolid);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_NORMALIZE);
-	glClearColor(0.1, 0.1, 0.1, 0.0);
-	glViewport(0, 0, 640, 480);
+	glutInitWindowSize(500, 500);
+	glutInitWindowPosition(0, 0);
+	glutCreateWindow("Teapot on a table");
+	init();
+	glutDisplayFunc(display);
+	glEnable(GL_LIGHTING); // enable the lighting properties
+	glEnable(GL_LIGHT0); // enable the light source
+	glShadeModel(GL_SMOOTH); // for smooth shading (select flat or smooth shading)
+	glEnable(GL_NORMALIZE); // If enabled and no vertex shader is active, normal vectors are normalized to unit length after transformation and before lighting. 
+	glEnable(GL_DEPTH_TEST); // do depth comparisons and update the depth buffer.
 	glutMainLoop();
 }
