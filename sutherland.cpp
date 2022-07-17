@@ -81,7 +81,8 @@ void CohenSutherlandLineClipAndDraw()
         glVertex2f(xvmin, yvmax);
         glEnd();
         glFlush();
-        glColor3f(0.0, 1.0, 0.0) glBegin(GL_LINES);
+        glColor3f(0.0, 1.0, 0.0);
+        glBegin(GL_LINES);
         glVertex2d(vx0, vy0);
         glVertex2d(vx1, vy1);
         glEnd();
